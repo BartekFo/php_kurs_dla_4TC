@@ -1,23 +1,36 @@
 <?php
-include_once 'view/mainView.php';
 class mainControler
 {
-    public function loadView($name, $path = 'view/')
+    public function __construct($request, $path = 'controler/')
     {
-        if (($name === '') || ($name === '/')) {
-            $name = 'main';
+        global $route;
+        $name = $request;
+        if (($name == '') || ($name == '/')) {
+            $name = 'home';
+            $request = 'home';
+        } else if (!in_array($name, $route)) {
+            $name = 'notFound';
+            $request = 'notFound';
         }
-        $name = $name . "View";
+        $name = ltrim($name, '/');
+        $request = ltrim($request, '/');
+        $name = $name . 'Controler';
         $path = $path . $name . '.php';
-        //view/mainView.php
-        //name - nazwa klasy
-        if (is_file($path)) {
-            $obj = new $name();
-            return $obj;
-        } else {
-            echo 'wrong path';
-            echo '<br>';
-            echo $path;
+
+        try {
+            if (is_file($path)) {
+                require $path;
+                $obj = new $name($request);
+            } else {
+                throw new Exception('Can not open controler ' . $name . ' in: ' . $path);
+            }
+        } catch (Exception $e) {
+            echo $e->getMessage() . '<br />
+                File: ' . $e->getFile() . '<br />
+                Code line: ' . $e->getLine() . '<br />
+                Trace: ' . $e->getTraceAsString();
+            exit;
         }
+        return $obj;
     }
 }
