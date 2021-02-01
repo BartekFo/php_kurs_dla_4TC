@@ -1,5 +1,4 @@
 <?php
-
 class Controler
 {
     public function loadView($name, $path = 'view/')

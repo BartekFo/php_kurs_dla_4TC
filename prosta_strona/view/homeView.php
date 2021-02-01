@@ -1,5 +1,4 @@
 <?php
-
 class homeView
 {
     public function __construct()
