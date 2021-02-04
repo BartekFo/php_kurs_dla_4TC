@@ -1,23 +1,25 @@
 <?php
-include_once "view/homeView.php";
 
-class loginView extends homeView
+class loginView extends view
 {
     public function __construct()
     {
         $auth = $this->loadModel("login");
         $this->set("error", "");
-        if (isset($_POST['submit'])) {
-            $auth->setLogin($_POST['email']);
-            $auth->setPassword($_POST['pwd']);
-
-            if ($auth->checkLogin("bartek@gmail.com", "bartek")) {
-                $this->set("error", "Udało się zalogować");
-                session_start();
-                $_SESSION['login'] = $auth->login;
-                $_SESSION['pwd'] = $auth->password;
-            } else {
-                $this->set("error", "Niepoprawny login lub hasło");
+        $this->set("isLogin", false);
+        if ($this->isLogged($auth)) {
+            $this->set("error", $auth->login);
+            $this->set("isLogin", true);
+            $this->redirect('orders');
+        } else {
+            if (isset($_POST['submit'])) {
+                if ($auth->checkLogin()) {
+                    $this->set("isLogin", true);
+                    $this->redirect('orders');
+                } else {
+                    $this->set('isLogin', false);
+                    $this->set("error", 'Niepoprawny login lub hasło');
+                }
             }
         }
         $this->render("login");

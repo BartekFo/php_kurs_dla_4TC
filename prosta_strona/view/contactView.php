@@ -1,7 +1,6 @@
 <?php
-include_once "view/homeView.php";
 
-class contactView extends homeView
+class contactView extends view
 {
     public function __construct()
     {

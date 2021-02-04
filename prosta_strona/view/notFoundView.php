@@ -1,7 +1,6 @@
 <?php
-include_once "view/homeView.php";
 
-class notFoundView extends homeView
+class notFoundView extends view
 {
     public function __construct()
     {

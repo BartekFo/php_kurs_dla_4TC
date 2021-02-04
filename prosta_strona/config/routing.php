@@ -1,3 +1,3 @@
 <?php
 
-$route = array("", "/", "/home", "/notfound", "/contact", "/orders", "/login");
+$route = array("", "/", "/home", "/notfound", "/contact", "/orders", "/login", "/logout");

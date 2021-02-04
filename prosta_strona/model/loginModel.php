@@ -12,12 +12,26 @@ class loginModel
         $this->password = $value;
     }
 
-    public function checkLogin($login, $password)
+    public function checkLogin()
     {
-        if (($login == $this->login) && ($password == $this->password)) {
+        if (($_POST['email'] == 'bartek@gmail.com') && ($_POST['pwd']) == 'bartek') {
+            $this->setLogin($_POST['email']);
+            $this->setPassword($_POST['pwd']);
+            $this->setSession($this->login, $this->password);
             return true;
         } else {
             return false;
         }
+    }
+
+    public function setSession($login, $password)
+    {
+        $_SESSION['login'] = $login;
+        $_SESSION['pwd'] = $password;
+    }
+
+    public function logout()
+    {
+        session_destroy();
     }
 }

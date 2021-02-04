@@ -1,15 +1,17 @@
 <?php
 
-class mojaKlasa {
+class mojaKlasa
+{
     public $pole;
 }
 
 $obj = new mojaKlasa();
-$obj->pole=12;
+$obj->pole = 12;
 // echo $obj->pole;
 
 
-class osoba {
+class osoba
+{
     protected $imie;
     private $nazwisko;
     public static $ile_osob;
@@ -19,8 +21,9 @@ class osoba {
         $this->_nazwisko = $nazwisko;
         self::$ile_osob++;
     }
-    public function ustawImie($imie){
-        $this->imie = $imie;
+    public function ustawImie($podaneImie)
+    {
+        $this->imie = $podaneImie;
         echo "klasa osoba";
     }
     public function __destruct()
@@ -31,22 +34,23 @@ class osoba {
     }
 };
 
-$obj1 = new osoba("jacek","kowalski");
+$obj1 = new osoba("jacek", "kowalski");
 unset($obj1);
-$obj2 = new osoba("Ala","Michalska");
-
+$obj2 = new osoba("Ala", "Michalska");
 echo '<br>';
 echo osoba::$ile_osob;
 echo '<br>';
 
-class postac extends osoba{
+class postac extends osoba
+{
     public function __construct($imie)
     {
         $this->imie = $imie;
     }
     public static $rodzaj;
 
-    public function ustawImie($imie){
+    public function ustawImie($imie)
+    {
         // $this->imie = $imie;
         parent::ustawImie($imie);
         echo "<br>";
@@ -60,13 +64,15 @@ class postac extends osoba{
     }
 }
 
-class pozytywna extends postac {
+class pozytywna extends postac
+{
     public static $rodzaj;
     public function __construct($name)
     {
         parent::__construct($name);
     }
-    public static function ustawRodzaj($rodzaj){
+    public static function ustawRodzaj($rodzaj)
+    {
         self::$rodzaj = $rodzaj;
     }
 }
