@@ -4,12 +4,7 @@ class loginModel
 {
     public function setLogin($value)
     {
-        $this->login = $value;
-    }
-
-    public function setPassword($value)
-    {
-        $this->password = $value;
+        $this->email = $value;
     }
 
     public function connectDb()
@@ -28,42 +23,79 @@ class loginModel
         }
     }
 
-    public function getUser($login, $pwd)
+    public function checkUser($login, $pwd)
     {
         $mysqli = $this->connectDb();
-        $sql = "SELECT email, password FROM users WHERE email=? AND password =?";
+        $sql = "SELECT email, password FROM users WHERE email = ?";
         //? $hashedPassword = sha1($pwd);
-        // * opcja z użyciem bcryptu i z przepuszczenie hasła 11 razy przez ziarno
-        $options = [
-            'cost' => 11
-        ];
-        $hashedPassword = password_hash($pwd, PASSWORD_BCRYPT, $options);
-        // *----------------------------------------------------------------
-        $stmt = $mysqli->prepare($sql);
-        $stmt->bind_param('ss', $login, $hashedPassword);
-        $stmt->execute();
-        if ($stmt->affected_rows == 0) {
-        }
+        //* 'apple' => "dauidhaidaiuhiua";
+        //* 'apple' + dadhaiudahiu => daihdbahjdbawdja;
 
-        $stmt->close();
+        $stmt = $mysqli->prepare($sql);
+        $stmt->bind_param('s', $login);
+        $stmt->execute();
+        $stmt->bind_result($email, $password);
+        print($stmt->affected_rows);
+        printf("%s (%s)\n", $email, $password);
+        if ($stmt->affected_rows > 0) {
+            $stmt->fetch();
+            $isPasswordVerified = password_verify($pwd, $password);
+            if ($isPasswordVerified) {
+                $stmt->close();
+                return true;
+            } else {
+                $stmt->close();
+                return false;
+            }
+        } else {
+            $stmt->close();
+            return false;
+        }
     }
 
     public function checkLogin()
     {
-        if (($_POST['email'] == 'bartek@gmail.com') && ($_POST['pwd']) == 'bartek') {
+        if ($this->checkUser($_POST['email'], $_POST['pwd'])) {
+            $token = bin2hex(random_bytes(16));
             $this->setLogin($_POST['email']);
-            $this->setPassword($_POST['pwd']);
-            $this->setSession($this->login, $this->password);
-            return true;
+            $this->setSession($this->email, $token);
+            if ($this->saveTokenToDb($token)) {
+                return true;
+            } else {
+                return false;
+            }
         } else {
             return false;
         }
     }
 
-    public function setSession($login, $password)
+    public function setSession($email, $token)
     {
-        $_SESSION['login'] = $login;
-        $_SESSION['pwd'] = $password;
+        $_SESSION['email'] = $email;
+        $_SESSION['token'] = $token;
+    }
+
+    public function saveTokenToDb($token)
+    {
+        $mysqli = $this->connectDb();
+        $sql = "SELECT idusers FROM users where email = '" . $_SESSION['email'] . "'";
+        $result = $mysqli->query($sql) or die($mysqli->error);
+        if ($result->fetch_assoc()) {
+            $id = $result->fetch_assoc();
+        } else {
+            printf('błąd', $mysqli->error);
+        }
+
+        $date = new DateTime();
+        $timeStamp = $date->getTimestamp();
+
+        $sql = "INSERT INTO tokens VALUES (NULL, " . $id . ", " . $token . ", " . $timeStamp . ")";
+        $result = $this->connectDb()->query($sql);
+        if ($result) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public function logout()
